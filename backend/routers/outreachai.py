@@ -39,6 +39,25 @@ async def generate_multiple_versions(request: MultiVersionRequest):
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post("/generate-debug")
+async def generate_outreach_debug(request: GenerateOutreachRequest):
+    """Debug version that shows raw output"""
+    try:
+        outreach_request = OutreachRequest(**request.dict())
+        result = agent.generate_outreach(outreach_request)
+        
+        # Return both raw result and parsed result
+        return {
+            "parsed": result.dict(),
+            "raw_type": str(type(result))
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
 
 @router.get("/channels")
 async def get_supported_channels():
